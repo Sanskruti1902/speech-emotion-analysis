@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speech Emotion Lab</title>
+<style>
+:root{--bg:#0b1020;--panel:#131b31;--panel2:#18233d;--text:#edf2ff;--muted:#aab6d3;--accent:#7c9cff;--mint:#55e0c1;--line:#2a3757}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#1a2850 0,#0b1020 42%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+header{padding:28px 5vw 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--mint));display:grid;place-items:center;color:#071326;font-size:25px;font-weight:900}
+h1{font-size:clamp(22px,3vw,32px);margin:0 0 5px}.subtitle{color:var(--muted);font-size:14px}
+.pill{border:1px solid #35527b;background:#152441;color:#b9d1ff;border-radius:30px;padding:8px 12px;font-size:12px}
+main{width:min(1200px,92vw);margin:28px auto 50px}.intro{margin-bottom:22px}.intro h2{font-size:23px;margin:0 0 8px}.intro p{color:var(--muted);line-height:1.6;margin:0;max-width:780px}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}.panel{background:rgba(19,27,49,.92);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 30px #0002}.panel h3{margin:0 0 14px;font-size:16px}
+.actions{display:grid;gap:10px}.btn{border:0;border-radius:11px;padding:12px 14px;font-weight:700;cursor:pointer;font-size:14px;transition:.15s}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(100deg,#829dff,#60e1c2);color:#071326}.secondary{background:#223252;color:var(--text);border:1px solid #36476c}.danger{background:#48253d;color:#ffd9e8;border:1px solid #77415e}
+.status{margin-top:14px;padding:12px;border-radius:10px;background:#10182b;color:var(--muted);font-size:13px;line-height:1.5;min-height:44px}.status.error{color:#ffb6c4;border:1px solid #743a50}.status.ok{color:#8ff2d9;border:1px solid #286c63}
+label.file{display:block;border:1px dashed #52658c;border-radius:12px;padding:14px;text-align:center;color:#c8d5f2;cursor:pointer;font-size:13px;margin:14px 0}input[type=file]{display:none}
+.hint{font-size:12px;color:var(--muted);line-height:1.55;margin-top:14px}.divider{height:1px;background:var(--line);margin:18px 0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.metric{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;min-width:0}.metric .label{color:var(--muted);font-size:12px;margin-bottom:9px}.metric .value{font-size:21px;font-weight:750;overflow-wrap:anywhere}.metric small{font-size:11px;color:var(--muted)}
+.result{padding:18px;border:1px solid #315c69;background:linear-gradient(120deg,#142d3a,#17233b);border-radius:15px;margin-bottom:18px}.result .tag{color:var(--mint);font-size:11px;text-transform:uppercase;letter-spacing:1.4px;font-weight:800}.result h2{font-size:21px;margin:8px 0}.result p{margin:0;color:#bdcbe3;font-size:13px;line-height:1.5}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}.chart-panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0}.chart-panel h3{font-size:14px;margin:0 0 12px}.chart-panel canvas{width:100%;height:220px;display:block}.wide{grid-column:1/-1}.wide canvas{height:270px}.empty{display:grid;place-items:center;text-align:center;min-height:420px;color:var(--muted);border:1px dashed #344361;border-radius:16px;padding:30px}.empty strong{color:#dce5ff;display:block;font-size:17px;margin-bottom:8px}
+footer{color:#8795b5;text-align:center;font-size:12px;padding:24px;border-top:1px solid var(--line)}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}@media(max-width:580px){.charts{grid-template-columns:1fr}.wide{grid-column:auto}.metrics{grid-template-columns:repeat(2,1fr)}header{padding:20px 4vw}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">〽</div><div><h1>Speech Emotion Lab</h1><div class="subtitle">Speech signal processing · DSP feature analysis</div></div></div>
+  <div class="pill">ENGINEERING PROJECT DEMO</div>
+</header>
+<main>
+  <section class="intro"><h2>Analyze the voice. Explore the signal.</h2><p>Record speech or upload a WAV file to view its waveform, frequency spectrum, short-time energy and spectrogram. The emotion result is a simple educational estimate from pitch and energy—not a clinical or scientifically validated emotion detector.</p></section>
+  <div class="layout">
+    <aside class="panel">
+      <h3>Audio input</h3>
+      <div class="actions">
+        <button id="startBtn" class="btn primary">● Start microphone recording</button>
+        <button id="stopBtn" class="btn danger" disabled>■ Stop recording</button>
+        <button id="analyzeBtn" class="btn secondary" disabled>Analyze recording</button>
+      </div>
+      <label class="file" for="fileInput">↑ Choose a WAV audio file<br><span style="font-size:11px;color:#8e9fbe">WAV · up to 120 seconds</span></label>
+      <input id="fileInput" type="file" accept=".wav,audio/wav">
+      <div class="actions"><button id="uploadBtn" class="btn secondary" disabled>Analyze uploaded audio</button></div>
+      <div id="status" class="status">Ready. Allow microphone access when your browser asks.</div>
+      <div class="divider"></div>
+      <h3>How it works</h3>
+      <div class="hint">1. Capture voice using your browser.<br>2. Convert audio to a WAV signal.<br>3. Extract RMS energy, zero-crossing rate and estimated pitch.<br>4. Display the signal plots and a rule-based result.</div>
+      <div class="hint">Privacy: audio is sent to the web server you run or deploy for analysis. Do not upload sensitive recordings.</div>
+    </aside>
+    <section>
+      <div id="results" hidden>
+        <div class="result"><div class="tag">Estimated result</div><h2 id="emotion">—</h2><p id="explanation"></p></div>
+        <div class="metrics">
+          <div class="metric"><div class="label">Duration</div><div class="value" id="duration">—</div><small>seconds</small></div>
+          <div class="metric"><div class="label">Median pitch</div><div class="value" id="pitch">—</div><small>Hz · voiced frames</small></div>
+          <div class="metric"><div class="label">Mean RMS energy</div><div class="value" id="energyMetric">—</div><small>normalized signal</small></div>
+          <div class="metric"><div class="label">Active frames</div><div class="value" id="active">—</div><small>speech activity ratio</small></div>
+        </div>
+        <div class="charts">
+          <div class="chart-panel"><h3>Speech waveform</h3><canvas id="waveCanvas"></canvas></div>
+          <div class="chart-panel"><h3>Frequency spectrum (0–4 kHz)</h3><canvas id="spectrumCanvas"></canvas></div>
+          <div class="chart-panel"><h3>Short-time RMS energy</h3><canvas id="energyCanvas"></canvas></div>
+          <div class="chart-panel wide"><h3>Spectrogram (frequency vs time)</h3><canvas id="specCanvas"></canvas></div>
+        </div>
+      </div>
+      <div id="empty" class="empty"><div><strong>Your analysis dashboard is ready</strong>Record a short voice sample or choose a WAV file, then analyze it to see the results here.</div></div>
+    </section>
+  </div>
+</main>
+<footer>Speech Emotion Lab · Educational DSP demonstration · Results depend on recording quality and simple thresholds.</footer>
+<script>
+const startBtn=document.getElementById('startBtn'), stopBtn=document.getElementById('stopBtn'), analyzeBtn=document.getElementById('analyzeBtn'), uploadBtn=document.getElementById('uploadBtn'), fileInput=document.getElementById('fileInput'), statusBox=document.getElementById('status');
+let audioContext=null, source=null, processor=null, micStream=null, recording=false, chunks=[], recordingLength=0, recordedBlob=null, selectedFile=null;
+function status(msg,type=''){statusBox.textContent=msg;statusBox.className='status '+type;}
+function setBusy(b){analyzeBtn.disabled=b||!recordedBlob;uploadBtn.disabled=b||!selectedFile;startBtn.disabled=b;stopBtn.disabled=b||!recording;}
+function mergeChunks(chunks){let length=chunks.reduce((s,a)=>s+a.length,0),out=new Float32Array(length),offset=0;for(const c of chunks){out.set(c,offset);offset+=c.length;}return out;}
+function floatToWav(samples,sampleRate){const buffer=new ArrayBuffer(44+samples.length*2),view=new DataView(buffer);function str(o,s){for(let i=0;i<s.length;i++)view.setUint8(o+i,s.charCodeAt(i));}str(0,'RIFF');view.setUint32(4,36+samples.length*2,true);str(8,'WAVE');str(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,sampleRate,true);view.setUint32(28,sampleRate*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);str(36,'data');view.setUint32(40,samples.length*2,true);let offset=44;for(let i=0;i<samples.length;i++,offset+=2){let s=Math.max(-1,Math.min(1,samples[i]));view.setInt16(offset,s<0?s*32768:s*32767,true);}return new Blob([view],{type:'audio/wav'});}
+startBtn.addEventListener('click',async()=>{try{if(!navigator.mediaDevices?.getUserMedia)throw new Error('Microphone recording requires HTTPS or localhost and a supported browser.');micStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}});audioContext=new (window.AudioContext||window.webkitAudioContext)();await audioContext.resume();source=audioContext.createMediaStreamSource(micStream);processor=audioContext.createScriptProcessor(4096,1,1);chunks=[];recordingLength=0;processor.onaudioprocess=e=>{if(recording){const input=e.inputBuffer.getChannelData(0);chunks.push(new Float32Array(input));recordingLength+=input.length;}};source.connect(processor);processor.connect(audioContext.destination);recording=true;recordedBlob=null;analyzeBtn.disabled=true;startBtn.disabled=true;stopBtn.disabled=false;status('Recording… speak naturally. Select “Stop recording” when finished.','ok');}catch(err){status('Microphone error: '+err.message+' Check browser permissions and use HTTPS on deployed sites.','error');}});
+stopBtn.addEventListener('click',async()=>{recording=false;try{processor?.disconnect();source?.disconnect();micStream?.getTracks().forEach(t=>t.stop());if(audioContext){const samples=mergeChunks(chunks);recordedBlob=floatToWav(samples,audioContext.sampleRate);await audioContext.close();audioContext=null;} }catch(e){status('Could not finish recording: '+e.message,'error');return;}setBusy(false);status('Recording ready ('+(recordingLength/(audioContext?.sampleRate||44100)).toFixed(1)+' s). Select Analyze recording.','ok');});
+fileInput.addEventListener('change',()=>{selectedFile=fileInput.files[0]||null;uploadBtn.disabled=!selectedFile;if(selectedFile)status('Selected: '+selectedFile.name+'. Click Analyze uploaded audio.');});
+async function sendAudio(blob,filename){const fd=new FormData();fd.append('audio',blob,filename);setBusy(true);status('Uploading and analyzing audio…');try{const res=await fetch('/analyze',{method:'POST',body:fd});const data=await res.json();if(!res.ok)throw new Error(data.error||'Analysis failed');render(data);status('Analysis complete.','ok');}catch(err){status(err.message,'error');}finally{setBusy(false);}}
+analyzeBtn.addEventListener('click',()=>{if(recordedBlob)sendAudio(recordedBlob,'recording.wav');});
+uploadBtn.addEventListener('click',()=>{if(selectedFile)sendAudio(selectedFile,selectedFile.name);});
+function canvasSetup(canvas){const dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();canvas.width=Math.max(1,Math.floor(rect.width*dpr));canvas.height=Math.max(1,Math.floor(rect.height*dpr));const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);return {ctx,w:rect.width,h:rect.height};}
+function drawLine(canvas,x,y,xLabel,yLabel,color='#7c9cff'){const {ctx,w,h}=canvasSetup(canvas);const pad={l:42,r:12,t:12,b:32},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;ctx.clearRect(0,0,w,h);ctx.font='11px Segoe UI';ctx.fillStyle='#aab6d3';ctx.strokeStyle='#2a3757';ctx.lineWidth=1;for(let i=0;i<=4;i++){let yy=pad.t+ph*i/4;ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();}ctx.strokeStyle=color;ctx.lineWidth=1.4;ctx.beginPath();for(let i=0;i<x.length;i++){let xx=pad.l+(x.length<=1?0:i/(x.length-1))*pw,yy=pad.t+ph*(1-(y[i]-Math.min(...y))/(Math.max(...y)-Math.min(...y)||1));if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);}ctx.stroke();ctx.fillStyle='#aab6d3';ctx.fillText(xLabel,pad.l+pw/2-20,h-7);ctx.save();ctx.translate(12,pad.t+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText(yLabel,0,0);ctx.restore();}
+function drawSpectrogram(canvas,matrix,minV,maxV){const {ctx,w,h}=canvasSetup(canvas);ctx.fillStyle='#0b1020';ctx.fillRect(0,0,w,h);if(!matrix?.length)return;const rows=matrix.length,cols=matrix[0].length;const cellW=w/cols,cellH=h/rows;for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){let v=(matrix[r][c]-minV)/(maxV-minV||1);v=Math.max(0,Math.min(1,v));let hue=240-220*v,light=18+52*v;ctx.fillStyle=`hsl(${hue},85%,${light}%)`;ctx.fillRect(c*cellW,h-(r+1)*cellH,Math.ceil(cellW),Math.ceil(cellH));}}ctx.fillStyle='#dce5ff';ctx.font='11px Segoe UI';ctx.fillText('0 Hz',6,h-5);ctx.fillText('4 kHz',6,13);ctx.fillText('Time →',w-52,h-5);}
+function render(d){document.getElementById('empty').hidden=true;document.getElementById('results').hidden=false;document.getElementById('emotion').textContent=d.emotion;document.getElementById('explanation').textContent=d.explanation;document.getElementById('duration').textContent=d.duration;document.getElementById('pitch').textContent=d.mean_pitch===null?'Not detected':d.mean_pitch;document.getElementById('energyMetric').textContent=d.mean_energy;document.getElementById('active').textContent=Math.round(d.active_ratio*100)+'%';drawLine(document.getElementById('waveCanvas'),d.waveform.time,d.waveform.amplitude,'Time (s)','Amplitude','#55e0c1');drawLine(document.getElementById('spectrumCanvas'),d.spectrum.frequency,d.spectrum.magnitude,'Frequency (Hz)','dB','#7c9cff');drawLine(document.getElementById('energyCanvas'),d.energy.time,d.energy.rms,'Time (s)','RMS','#f0b86c');drawSpectrogram(document.getElementById('specCanvas'),d.spectrogram,d.spectrogram_min,d.spectrogram_max);}
+window.addEventListener('resize',()=>{ /* charts redraw on next analysis */ });
+</script>
+</body>
+</html>
